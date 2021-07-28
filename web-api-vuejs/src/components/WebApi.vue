@@ -15,7 +15,7 @@
           <tbody>
             <tr v-for="book in books" :key="book.id">
               <td>{{ book.title}}</td>
-              <td>{{ book.date}}</td>
+              <td>{{ formatDate(book.date) }}</td>
               <td class="text-right">
                 <a href="#" @click.prevent="updateBook(book)">Edit</a> -
                 <a href="#" @click.prevent="deleteBook(book.id)">Delete</a>
@@ -46,6 +46,7 @@
 <script>
 
 import api from '@/WebApiService';
+import moment from 'moment'
 
 export default {
   data() {
@@ -71,6 +72,7 @@ export default {
     async updateBook(book) {
       // you use Object.assign() to create a new (separate) instance
       this.model = Object.assign({}, book)
+      this.model.date = this.formatLocalDate(this.model.date)
     },
     async createBook() {
       const isUpdate = !!this.model.id;
@@ -96,6 +98,17 @@ export default {
 
         await api.delete(id)
         await this.getAll()
+      }
+    },
+    formatDate(value){
+        if (value) {
+          var date = moment.utc(String(value)).format('MM/DD/YYYYThh:mm')
+          return date.replace('T', ' ');
+        }
+    },
+    formatLocalDate(value){
+      if (value) {
+        return moment.utc(String(value)).format('YYYY-MM-DDTHH:mm')
       }
     }
   }
